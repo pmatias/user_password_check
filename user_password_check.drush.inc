@@ -1,8 +1,5 @@
 <?php
 
-//use Drush\User\UserList;
-//use Drush\User\UserListException;
-
 /**
  * Implementation of hook_drush_command().
  */
