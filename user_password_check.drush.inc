@@ -1,7 +1,7 @@
 <?php
 
-use Drush\User\UserList;
-use Drush\User\UserListException;
+//use Drush\User\UserList;
+//use Drush\User\UserListException;
 
 /**
  * Implementation of hook_drush_command().
@@ -39,7 +39,7 @@ function user_password_check_drush_command() {
 /**
 * Check user password
 */
-function drush_user_password_check($inputs = '') {
+function drush_user_password_check($users = '') {
   require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
   
   $block_user = drush_get_option('block-user', FALSE);
@@ -50,55 +50,53 @@ function drush_user_password_check($inputs = '') {
       $password_list = array_merge($password_list, file($pass_file));
     }
   }
+  
+  $user_list = _drush_user_get_users_from_options_and_arguments($users);
 
-  try {
-    // remember the authmap table!
-    $userlist_collection = new UserList($inputs);
-    $userlist = $userlist_collection->accounts;
-  }
-  catch (UserListException $e) {
-    // No user option or argument was passed, so we get them all.
-    $userlist = db_query('SELECT u.uid, u.name, u.pass 
-      FROM users u 
-      LEFT JOIN authmap a ON u.uid = a.uid
+  if (empty($user_list)) {
+    // No uids were specified, let's get them all.
+    // Not using drush_db_select since it does not have support for JOIN.
+    $user_list = db_query("SELECT u.uid, u.name, u.pass 
+      FROM {users} u 
+      LEFT JOIN {authmap} a ON u.uid = a.uid
       WHERE u.uid > 0
       AND u.status = 1
-      AND a.uid IS NULL')
-    ->fetchAll();
-  } 
-  
-  foreach ($userlist as $user) {
-    $user = ($user->name) ? $user : $user->account;
+      AND a.uid IS NULL")
+      ->fetchAll();
+  }
     
-    // We want to know first if the user has the
+  foreach ($user_list as $user) {
+    $user_object = ($user->name) ? $user : user_load($user);
+    
+    // We want to know, first, if the user has the
     // user/user user/password combination.
-    if (user_check_password($user->name, $user)) {
+    if (user_check_password($user_object->name, $user_object)) {
       if ($block_user) {
-        user_block_user_action($user);
-        drush_log(dt('User !user has been blocked.', array('!user' => $user->name)), 'success');        
+        user_block_user_action($user_object);
+        drush_log(dt('User !user has been blocked.', array('!user' => $user_object->name)), 'success');        
       }
       else {
-        drush_log(dt('User !user has weak credentials.', array('!user' => $user->name)), 'warning');
+        drush_log(dt('User !user has weak credentials.', array('!user' => $user_object->name)), 'warning');
       }
       continue;
     }
     
     // We also want to know if the user has a password that belongs 
-    // to the password list.
+    // to the provided password list.
     if ($password_list) {
       foreach($password_list as $password){
-        if(user_check_password(trim($password), $user)) {
+        if(user_check_password(trim($password), $user_object)) {
           if ($block_user) {
-            user_block_user_action($user);
-            drush_log(dt('User !user has been blocked.', array('!user' => $user->name)), 'success');
+            user_block_user_action($user_object);
+            drush_log(dt('User !user has been blocked.', array('!user' => $user_object->name)), 'success');
           }
           else {
-            drush_log(dt('User !user has weak credentials.', array('!user' => $user->name)), 'warning');
+            drush_log(dt('User !user has weak credentials.', array('!user' => $user_object->name)), 'warning');
           }
           break;
         }
       }
     }
   }
-  
+
 }
