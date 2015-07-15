@@ -1,11 +1,15 @@
 <?php
+/**
+ * @file
+ * New user-password-check command for drush.
+ */
 
 /**
- * Implementation of hook_drush_command().
+ * Implements hook_drush_command().
  */
 function user_password_check_drush_command() {
   $items = array();
-  
+
   $items['user-password-check'] = array(
     'description' => 'Check user(s) basic credentials security.',
     'aliases' => array('upchk'),
@@ -14,11 +18,11 @@ function user_password_check_drush_command() {
     ),
     'examples' => array(
       'drush user-password-check 5,user3 --uid=2,3 --name=someguy,somegal --mail=billgates@microsoft.com' =>
-        'Check the users with name, id, or email 5 or user3, uids 2 and 3, names someguy and somegal, and email address of billgates@microsoft.com',
+      'Check the users with name, id, or email 5 or user3, uids 2 and 3, names someguy and somegal, and email address of billgates@microsoft.com',
     ),
     'options' => array(
       'password-list' => array(
-        'description' => 'A comma separated file list of passwords.',
+        'description' => 'A comma separated list of passwords file(s).',
         'required' => FALSE,
         'example-value' => 'password_list_1.txt,password_list_2.txt,...',
       ),
@@ -27,27 +31,27 @@ function user_password_check_drush_command() {
         'required' => FALSE,
       ),
     ),
-  );  
-  
+  );
+
   return $items;
 }
 
 
 /**
-* Check user password
-*/
+ * Check user password.
+ */
 function drush_user_password_check($users = '') {
   require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
-  
+
   $block_user = drush_get_option('block-user', FALSE);
-  
+
   if (drush_get_option('password-list')) {
     $password_list = array();
     foreach (explode(",", drush_get_option('password-list')) as $pass_file) {
       $password_list = array_merge($password_list, file($pass_file));
     }
   }
-  
+
   $user_list = _drush_user_get_users_from_options_and_arguments($users);
 
   if (empty($user_list)) {
@@ -61,28 +65,28 @@ function drush_user_password_check($users = '') {
       AND a.uid IS NULL")
       ->fetchAll();
   }
-    
+
   foreach ($user_list as $user) {
     $user_object = ($user->name) ? $user : user_load($user);
-    
+
     // We want to know, first, if the user has the
     // user/user user/password combination.
     if (user_check_password($user_object->name, $user_object)) {
       if ($block_user) {
         user_block_user_action($user_object);
-        drush_log(dt('User !user has been blocked.', array('!user' => $user_object->name)), 'success');        
+        drush_log(dt('User !user has been blocked.', array('!user' => $user_object->name)), 'success');
       }
       else {
         drush_log(dt('User !user has weak credentials.', array('!user' => $user_object->name)), 'warning');
       }
       continue;
     }
-    
-    // We also want to know if the user has a password that belongs 
+
+    // We also want to know if the user has a password that belongs
     // to the provided password list.
     if ($password_list) {
-      foreach($password_list as $password){
-        if(user_check_password(trim($password), $user_object)) {
+      foreach ($password_list as $password) {
+        if (user_check_password(trim($password), $user_object)) {
           if ($block_user) {
             user_block_user_action($user_object);
             drush_log(dt('User !user has been blocked.', array('!user' => $user_object->name)), 'success');
