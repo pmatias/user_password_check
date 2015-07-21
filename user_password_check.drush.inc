@@ -36,7 +36,6 @@ function user_password_check_drush_command() {
   return $items;
 }
 
-
 /**
  * Check user password.
  */
@@ -50,6 +49,7 @@ function drush_user_password_check($users = '') {
     foreach (explode(",", drush_get_option('password-list')) as $pass_file) {
       $password_list = array_merge($password_list, file($pass_file));
     }
+    asort($password_list);
   }
 
   $user_list = _drush_user_get_users_from_options_and_arguments($users);
