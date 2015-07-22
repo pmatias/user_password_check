@@ -4,6 +4,16 @@
  * New user-password-check command for drush.
  */
 
+ /**
+  * Implements hook_drush_help().
+  */
+function user_password_check_drush_help($section) {
+  switch ($section) {
+    case 'drush:user-password-check':
+      return 'Check user(s) credentials basic security.';
+  }
+}
+
 /**
  * Implements hook_drush_command().
  */
@@ -11,14 +21,14 @@ function user_password_check_drush_command() {
   $items = array();
 
   $items['user-password-check'] = array(
-    'description' => 'Check user(s) basic credentials security.',
+    'description' => 'Check user(s) credentials basic security.',
     'aliases' => array('upchk'),
     'arguments' => array(
       'users' => 'A comma delimited list of uids, user names, or email addresses of users to check.',
     ),
     'examples' => array(
       'drush user-password-check 5,user3 --uid=2,3 --name=someguy,somegal --mail=billgates@microsoft.com' =>
-      'Check the users with name, id, or email 5 or user3, uids 2 and 3, names someguy and somegal, and email address of billgates@microsoft.com',
+      dt('Check the users with name, id, or email 5 or user3, uids 2 and 3, names someguy and somegal, and email address of billgates@microsoft.com'),
     ),
     'options' => array(
       'password-list' => array(
