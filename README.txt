@@ -26,9 +26,12 @@ $ drush en -y user_password_check
 
 ## Usage
 
-
 ```
-drush user-password-check 5,user3 --uid=2,3 --name=someguy,somegal --mail=billgates@microsoft.com
+drush user-password-check user
+```
+or
+```
+drush upchk 5,user3 --uid=2,3 --name=someguy,somegal --mail=billgates@microsoft.com
 ```
 Check the users with name, id, or email 5 or user3, uids 2 and 3, 
 names someguy and somegal, and email address of billgates@microsoft.com
@@ -49,7 +52,7 @@ drush upchk admin --block-user
 It will block the user admin if the password is also admin.
 
 ```
-drush upchk admin --block-user --password_list=file1.txt,file2.txt,...
+drush upchk admin --block-user --password-files=file1.txt,file2.txt,...
 ```
 
 It will block the user admin if the password is also admin or its password

@@ -31,7 +31,7 @@ function user_password_check_drush_command() {
       dt('Check the users with name, id, or email 5 or user3, uids 2 and 3, names someguy and somegal, and email address of billgates@microsoft.com'),
     ),
     'options' => array(
-      'password-list' => array(
+      'password-files' => array(
         'description' => 'A comma separated list of passwords file(s).',
         'required' => FALSE,
         'example-value' => 'password_list_1.txt,password_list_2.txt,...',
@@ -54,10 +54,11 @@ function drush_user_password_check($users = '') {
 
   $block_user = drush_get_option('block-user', FALSE);
 
-  if (drush_get_option('password-list')) {
+  $password_files = drush_get_option('password-files');
+  if ($password_files) {
     $password_list = array();
-    foreach (explode(",", drush_get_option('password-list')) as $pass_file) {
-      $password_list = array_merge($password_list, file($pass_file));
+    foreach (explode(",", $password_files) as $password_file) {
+      $password_list = array_merge($password_list, file($password_file));
     }
     asort($password_list);
   }
