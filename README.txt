@@ -1,20 +1,18 @@
-Check user passwords
-====================
+INTRODUCTION
+------------
 
 This Drupal module adds a new command to 
 Drush (https://github.com/drush-ops/drush) to check for weak credentials and 
 compare against a password list file (or several).
 
-Installation
-============
 
-Requirements:
+REQUIREMENTS
 -------------
 * Drush 6.x (Drush 7.x support is coming)
 
 
-Manual Installation
--------------------
+INSTALLATION
+------------
 * Clone this repository inside your `sites/all/modules` directory
 
 $ git clone --branch 7.x-1.x http://git.drupal.org/sandbox/pable/2534886.git 
@@ -23,7 +21,7 @@ $ git clone --branch 7.x-1.x http://git.drupal.org/sandbox/pable/2534886.git
 * Enable the module in the modules section (`admin/modules`).
 
 
-Usage
+USAGE
 -----
 
   drush user-password-check user
@@ -56,13 +54,20 @@ is in one of the provided files:
 
 
 
-Known issues
-============
+KNOWN ISSUES
+------------
 
 * The verification doesn't play nice with big password lists against a big
 users table (A.K.A. takes too much time)
  
-Roadmap
-=======
+
+ROADMAP
+-------
+
 * Better performance
 * Drupal backend 
+
+
+MAINTAINERS
+-----------
+Pablo Fabregat - https://www.drupal.org/u/pablitt

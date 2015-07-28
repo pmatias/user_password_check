@@ -63,6 +63,7 @@ function drush_user_password_check($users = '') {
     asort($password_list);
   }
 
+  // https://github.com/drush-ops/drush/blob/6.x/commands/user/user.drush.inc#L547
   $user_list = _drush_user_get_users_from_options_and_arguments($users);
 
   if (empty($user_list)) {
